@@ -1,43 +1,14 @@
-#! /usr/bin/env python
-
 import os
 import sys
 import shutil
 
 
 shittyfiles = [
-    '~/.adobe',              # Flash crap
-    '~/.macromedia',         # Flash crap
-    '~/.recently-used',
-    '~/.local/share/recently-used.xbel',
-    '~/Desktop',             # Firefox creates this
-    '~/.thumbnails',
-    '~/.gconfd',
-    '~/.gconf',
-    '~/.local/share/gegl-0.2',
-    '~/.FRD/log/app.log',   # FRD
-    '~/.FRD/links.txt',     # FRD
-    '~/.objectdb',          # FRD
-    '~/.gstreamer-0.10',
-    '~/.pulse',
-    '~/.esd_auth',
-    '~/.config/enchant',
-    '~/.spicec',            # contains only log file; unconfigurable
-    '~/.dropbox-dist',
-    '~/.parallel',
-    '~/.dbus',
-    '~/ca2',                # WTF?
-    '~/ca2~',               # WTF?
-    '~/.distlib/',          # contains another empty dir, don't know which software creates it
-    '~/.bazaar/',           # bzr insists on creating files holding default values
-    '~/.bzr.log',
-    '~/.nv/',
-    '~/.viminfo',           # configured to be moved to ~/.cache/vim/viminfo, but it is still sometimes created...
-    '~/.npm/',              # npm cache
-    '~/.java/',
-    '~/.oracle_jre_usage/',
-    '~/.jssc/',
-    '~/.tox/',              # cache directory for tox
+	'~/_viminfo',
+	'~/.bash_history',
+	'~/AppData/Local/Temp',
+	'~/Downloads',
+	'/temp/*'
 ]
 
 
@@ -47,7 +18,7 @@ def yesno(question, default="n"):
     """
     prompt = "%s (y/[n]) " % question
 
-    ans = input(prompt).strip().lower()
+    ans = raw_input(prompt).strip().lower()
 
     if not ans:
         ans = default
@@ -56,6 +27,9 @@ def yesno(question, default="n"):
         return True
     return False
 
+def errHandler(f, path, e):
+	print e
+	print "{0}: {1}".format(path, e[1].strerror)
 
 def rmshit():
     print("Found shittyfiles:")
@@ -73,9 +47,12 @@ def rmshit():
     if yesno("Remove all?", default="n"):
         for f in found:
             if os.path.isfile(f):
-                os.remove(f)
+				try:
+					os.remove(f)
+				except OSError as e:
+					errHandler(e)
             else:
-                shutil.rmtree(f)
+                shutil.rmtree(f, False, errHandler)
         print("All cleaned")
     else:
         print("No file removed")
